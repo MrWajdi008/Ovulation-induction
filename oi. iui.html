@@ -1,0 +1,798 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OI-IUI Protocol Guide</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // --- SVGs for Icons (Replaces lucide-react for single-file compatibility) ---
+    const IconStethoscope = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 2v6a6 6 0 0 0 12 0V2"/><path d="M8 15v6"/><circle cx="8" cy="21" r="2"/></svg>
+    );
+    const IconRefresh = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg>
+    );
+    const IconCheck = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    );
+    const IconCheckCircle = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    );
+    const IconActivity = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    );
+    const IconAlertTriangle = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    );
+    const IconAlertOctagon = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    );
+    const IconChevronRight = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    );
+    const IconChevronLeft = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    );
+    const IconPill = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+    );
+    const IconInfo = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    );
+    const IconCalendar = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    );
+    const IconSyringe = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+    );
+
+    // --- DATA ---
+    const EXCLUSION_CRITERIA = [
+      { id: 'tubal', label: 'Bilateral tubal occlusion or severe tubal disease' },
+      { id: 'severe_male', label: 'Severe male factor (post-wash TMSC < 1 million)' },
+      { id: 'age_reserve', label: 'Age ≥40 with low ovarian reserve (AMH < 1.0 ng/mL or AFC < 5)' },
+      { id: 'untreated_structural', label: 'Untreated hydrosalpinx, large submucous fibroid, or severe endometriosis' },
+      { id: 'untreated_endocrine', label: 'Untreated thyroid disease, hyperprolactinaemia, or undiagnosed AUB' },
+    ];
+
+    const DIAGNOSES = [
+      { id: 'pcos', label: 'PCOS / Anovulation (WHO-II)', icon: IconActivity },
+      { id: 'unexplained', label: 'Unexplained Infertility', icon: IconCheckCircle },
+      { id: 'mild_male', label: 'Mild Male Factor (TMSC 5-10M)', icon: IconActivity },
+      { id: 'endometriosis', label: 'Mild-Moderate Endometriosis', icon: IconAlertTriangle },
+      { id: 'cervical', label: 'Cervical Factor / Ejaculatory Dys.', icon: IconCheckCircle },
+      { id: 'high_reserve', label: 'High Reserve (AMH >5) / Risk of OHSS', icon: IconAlertTriangle }
+    ];
+
+    const PROTOCOLS = {
+      pcos: {
+        firstLine: 'Letrozole 2.5 mg PO OD',
+        duration: '5 days (D2–D6 or D3–D7)',
+        escalation: 'Escalate to 5 mg, then max 7.5 mg next cycle if anovulatory/follicle <14mm by D14.',
+        secondLine: 'Clomiphene; then low-dose FSH; or ovarian drilling.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Letrozole is recommended first-line for PCOS (higher ovulation & LBR vs CC).'
+      },
+      unexplained: {
+        firstLine: 'Letrozole 2.5–5 mg OR Clomiphene 50–100 mg PO OD',
+        duration: '5 days (D2–D6)',
+        escalation: 'If poor response, escalate dose in subsequent cycles.',
+        secondLine: 'Low-dose gonadotropin (75 IU step-up) + IUI with strict cancellation criteria.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Oral agents preferred over gonadotropins to minimize multiple pregnancy risk.'
+      },
+      mild_male: {
+        firstLine: 'Letrozole or Clomiphene + IUI',
+        duration: '5 days (D2–D6)',
+        escalation: 'Escalate dose if inadequate response.',
+        secondLine: 'Low-dose gonadotropin + IUI; IVF/ICSI after 3 failed cycles.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Post-wash TMSC should be ≥ 5 million.'
+      },
+      endometriosis: {
+        firstLine: 'Letrozole + IUI (up to 3–4 cycles)',
+        duration: '5 days (D2–D6)',
+        escalation: 'Escalate letrozole dose if needed.',
+        secondLine: 'Direct IVF if age >35 or AMH low.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Applicable for mild-moderate post-surgical endometriosis.'
+      },
+      cervical: {
+        firstLine: 'Natural cycle IUI ± letrozole',
+        duration: '5 days (if letrozole used)',
+        escalation: 'Avoid Clomiphene due to negative effect on cervical mucus.',
+        secondLine: 'Donor IUI if applicable.',
+        triggerTarget: 'Lead follicle ≥18 mm',
+        note: 'Avoid CC due to cervical mucus effect.'
+      },
+      high_reserve: {
+        firstLine: 'Sequential Letrozole + Low-Dose Gonadotropin',
+        duration: 'Letrozole 2.5mg D2-6, then rFSH 37.5–75 IU SC from D7',
+        escalation: 'Titrate rFSH strictly based on response.',
+        secondLine: 'Strict cancellation criteria must be applied.',
+        triggerTarget: 'Lead follicle ≥17 mm with ≤3 follicles ≥14 mm',
+        note: 'Advanced protocol: Equivalent pregnancy rates with reduced gonadotropin dose and OHSS risk.'
+      }
+    };
+
+    const CANCELLATION_CRITERIA = [
+      { trigger: '≥4 follicles ≥14 mm OR ≥3 follicles ≥16 mm', action: 'CANCEL — withhold trigger; advise barrier method until next menses.', type: 'danger' },
+      { trigger: 'Estradiol >1,000 pg/mL on trigger day', action: 'CANCEL — high OHSS risk; consider conversion to IVF freeze-all.', type: 'danger' },
+      { trigger: 'No follicle ≥14 mm by D14 (oral agents)', action: 'CANCEL — poor responder. Escalate dose next cycle.', type: 'warning' },
+      { trigger: 'Endometrium <6 mm on trigger day', action: 'RELATIVE CANCEL — consider proceeding if patient counselled; switch to letrozole next cycle.', type: 'warning' },
+      { trigger: 'Premature LH surge / ovulation before trigger', action: 'Convert to natural cycle IUI within 24 h, or cancel.', type: 'info' },
+      { trigger: 'Post-wash TMSC <1 million on day of IUI', action: 'Discuss with patient: proceed with caveat OR cancel for IVF/ICSI.', type: 'info' }
+    ];
+
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      const [step, setStep] = useState(1);
+      const [exclusions, setExclusions] = useState({});
+      const [diagnosis, setDiagnosis] = useState('');
+
+      const hasExclusion = Object.values(exclusions).some(val => val === true);
+      
+      const handleExclusionToggle = (id) => {
+        setExclusions(prev => ({ ...prev, [id]: !prev[id] }));
+      };
+
+      const resetFlow = () => {
+        setStep(1);
+        setExclusions({});
+        setDiagnosis('');
+      };
+
+      const STEPS = ['Selection', 'Regimen', 'Monitoring', 'Cancellation'];
+
+      const StepIndicator = () => (
+        <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-8 px-2">
+          {STEPS.map((label, index) => {
+            const num = index + 1;
+            return (
+            <div key={num} className="flex flex-col items-center">
+              <div className="flex items-center">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-colors ${
+                  step === num ? 'bg-blue-600 text-white shadow-md' :
+                  step > num ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  {step > num ? <IconCheck size={16} /> : num}
+                </div>
+                {num < 4 && (
+                  <div className={`w-8 sm:w-12 h-1 mx-1 sm:mx-2 rounded ${step > num ? 'bg-blue-600' : 'bg-gray-100'}`} />
+                )}
+              </div>
+              <span className={`text-[10px] sm:text-xs font-medium mt-1 ${step >= num ? 'text-slate-700' : 'text-slate-400'}`}>{label}</span>
+            </div>
+          )})}
+        </div>
+      );
+
+      return (
+        <div className="min-h-screen font-sans pb-12">
+          <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <IconStethoscope className="text-white w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-slate-900 leading-tight">OI-IUI Protocol</h1>
+                  <p className="text-xs text-slate-500 font-medium">Hospital Putrajaya</p>
+                </div>
+              </div>
+              <button onClick={resetFlow} className="text-slate-400 hover:text-blue-600 flex items-center text-sm font-medium">
+                <IconRefresh size={16} className="mr-1" />
+                <span className="hidden sm:inline">New</span>
+              </button>
+            </div>
+          </header>
+
+          <main className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
+            <StepIndicator />
+
+            {/* STEP 1 */}
+            {step === 1 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Patient Selection</h2>
+                  <p className="text-sm text-slate-500 mb-6">Confirm eligibility and select primary diagnosis.</p>
+                  
+                  <div className="mb-8">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 flex items-center">
+                      <IconCheckCircle className="mr-2 text-blue-500" size={20} /> 1. Exclusions
+                    </h3>
+                    <div className="space-y-3">
+                      {EXCLUSION_CRITERIA.map(criterion => (
+                        <label key={criterion.id} className={`flex items-start p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${exclusions[criterion.id] ? 'border-red-500 bg-red-50' : 'border-slate-100 bg-white hover:border-blue-200'}`}>
+                          <div className="flex-shrink-0 mt-0.5">
+                            <input type="checkbox" className="w-5 h-5 rounded text-red-600" checked={exclusions[criterion.id] || false} onChange={() => handleExclusionToggle(criterion.id)} />
+                          </div>
+                          <span className={`ml-3 text-sm sm:text-base font-medium ${exclusions[criterion.id] ? 'text-red-900' : 'text-slate-700'}`}>{criterion.label}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {hasExclusion && (
+                      <div className="mt-4 bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl flex items-start">
+                        <IconAlertOctagon className="w-6 h-6 mr-3 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-sm sm:text-base">Not Suitable for OI-IUI</h4>
+                          <p className="text-xs sm:text-sm mt-1">Patient has exclusion criteria. Escalate to IVF/ICSI.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`transition-opacity duration-300 ${hasExclusion ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 flex items-center">
+                      <IconActivity className="mr-2 text-blue-500" size={20} /> 2. Diagnosis
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                      {DIAGNOSES.map(diag => {
+                        const Icon = diag.icon;
+                        return (
+                          <button key={diag.id} onClick={() => setDiagnosis(diag.id)} className={`text-left p-4 rounded-xl border-2 flex items-start space-x-3 ${diagnosis === diag.id ? 'border-blue-600 bg-blue-50' : 'border-slate-100 hover:border-blue-200'}`}>
+                            <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${diagnosis === diag.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                              <Icon size={18} />
+                            </div>
+                            <h3 className={`font-bold text-sm sm:text-base ${diagnosis === diag.id ? 'text-blue-900' : 'text-slate-700'}`}>{diag.label}</h3>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-slate-100">
+                    <button disabled={hasExclusion || !diagnosis} onClick={() => setStep(2)} className={`flex items-center px-6 py-3 rounded-xl font-bold ${hasExclusion || !diagnosis ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white shadow-md'}`}>
+                      Regimen <IconChevronRight className="ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2 */}
+            {step === 2 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(1)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">Recommended Regimen</h2>
+                  <p className="text-blue-600 font-semibold text-sm mb-6 flex items-center"><IconActivity size={16} className="mr-2" />{DIAGNOSES.find(d => d.id === diagnosis)?.label}</p>
+
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-2xl border border-blue-100">
+                      <h3 className="text-base font-bold text-blue-900 mb-4 flex items-center">
+                        <div className="bg-blue-600 text-white p-1.5 rounded mr-2"><IconPill size={16} /></div> First-Line Plan
+                      </h3>
+                      <div className="space-y-4">
+                        <div><p className="text-xs font-bold text-blue-500 uppercase">Medication & Dose</p><p className="text-base sm:text-lg font-bold text-slate-800">{PROTOCOLS[diagnosis].firstLine}</p></div>
+                        <div><p className="text-xs font-bold text-blue-500 uppercase">Duration</p><p className="text-sm sm:text-base text-slate-700 font-medium">{PROTOCOLS[diagnosis].duration}</p></div>
+                        <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50"><p className="text-xs font-bold text-blue-500 uppercase">Escalation Rule</p><p className="text-xs sm:text-sm text-slate-700">{PROTOCOLS[diagnosis].escalation}</p></div>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-slate-50 p-5 rounded-xl border border-slate-200"><h3 className="text-xs sm:text-sm font-bold text-slate-500 uppercase flex items-center mb-2"><IconAlertTriangle size={14} className="mr-2" /> Second-Line</h3><p className="text-xs sm:text-sm text-slate-700">{PROTOCOLS[diagnosis].secondLine}</p></div>
+                      <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-100"><h3 className="text-xs sm:text-sm font-bold text-emerald-600 uppercase flex items-center mb-2"><IconInfo size={14} className="mr-2" /> Note</h3><p className="text-xs sm:text-sm text-emerald-800 font-medium">{PROTOCOLS[diagnosis].note}</p></div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 mt-6 border-t border-slate-100">
+                    <button onClick={() => setStep(3)} className="flex items-center px-6 py-3 rounded-xl font-bold bg-blue-600 text-white shadow-md">
+                      Monitoring <IconChevronRight className="ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3 */}
+            {step === 3 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(2)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 flex items-center"><IconCalendar className="mr-2 text-blue-600" size={24} /> Cycle Timeline</h2>
+
+                  <div className="relative border-l-2 border-slate-200 ml-3 space-y-8 pb-4">
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-slate-300 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-slate-800">D1 - D3: Baseline & Start</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Exclude cyst &gt;15mm or E2 &gt;50 pg/mL. Endometrium &lt;5mm. Start medication on D2 or D3.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-blue-400 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-slate-800">D8 - D10: Follicle Tracking #1</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">First TVS. Document follicles ≥10mm. Repeat every 2-3 days.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-6 h-6 bg-blue-100 border-2 border-blue-600 text-blue-600 rounded-full -left-[13px] top-0 flex items-center justify-center">
+                        <IconSyringe size={12} />
+                      </div>
+                      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 mt-[-4px]">
+                        <h3 className="font-bold text-base sm:text-lg text-blue-900 mb-2">TRIGGER DAY</h3>
+                        <div className="text-xs sm:text-sm space-y-1">
+                          <p><strong className="text-blue-700">Target:</strong> {PROTOCOLS[diagnosis].triggerTarget}</p>
+                          <p><strong className="text-blue-700">Dose:</strong> hCG 5k–10k IU IM <span className="font-bold">OR</span> rec-hCG 250 µg SC</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-indigo-600 rounded-full border-2 border-white -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-indigo-900">34–40h Post-Trigger: IUI</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Single IUI standard. Inseminate within 30 min of prep.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-emerald-400 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base text-emerald-800">Post-IUI: Luteal Support</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Start 1-3 days post-IUI (e.g. Vaginal Progesterone 400mg BD).</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end pt-6 mt-2 border-t border-slate-100">
+                    <button onClick={() => setStep(4)} className="flex items-center px-4 sm:px-6 py-3 rounded-xl font-bold bg-red-600 text-white shadow-md text-sm sm:text-base">
+                      Cancellation Criteria <IconChevronRight className="ml-1 sm:ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4 */}
+            {step === 4 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(3)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-red-700 mb-4 flex items-center"><IconAlertOctagon className="mr-2" size={24} /> Strict Cancellation</h2>
+                  
+                  <div className="space-y-3 sm:space-y-4">
+                    {CANCELLATION_CRITERIA.map((criterion, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border-l-4 ${criterion.type === 'danger' ? 'border-l-red-500 bg-red-50' : criterion.type === 'warning' ? 'border-l-amber-500 bg-amber-50' : 'border-l-blue-500 bg-blue-50'}`}>
+                        <h4 className="font-bold text-slate-800 text-sm sm:text-base mb-1">{criterion.trigger}</h4>
+                        <p className={`text-xs sm:text-sm font-medium flex items-start ${criterion.type === 'danger' ? 'text-red-900' : criterion.type === 'warning' ? 'text-amber-900' : 'text-blue-900'}`}>
+                          <IconChevronRight className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" /> <span><strong className="uppercase">Action:</strong> {criterion.action}</span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8">
+                    <button onClick={resetFlow} className="w-full bg-slate-800 text-white px-6 py-4 rounded-xl font-bold shadow text-center">
+                      Finish / Start New Patient
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
+
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OI-IUI Protocol Guide</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // --- SVGs for Icons (Replaces lucide-react for single-file compatibility) ---
+    const IconStethoscope = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 2v6a6 6 0 0 0 12 0V2"/><path d="M8 15v6"/><circle cx="8" cy="21" r="2"/></svg>
+    );
+    const IconRefresh = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg>
+    );
+    const IconCheck = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    );
+    const IconCheckCircle = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    );
+    const IconActivity = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    );
+    const IconAlertTriangle = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    );
+    const IconAlertOctagon = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    );
+    const IconChevronRight = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    );
+    const IconChevronLeft = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    );
+    const IconPill = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+    );
+    const IconInfo = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    );
+    const IconCalendar = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    );
+    const IconSyringe = ({ size=24, className="" }) => (
+      <svg width={size} height={size} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+    );
+
+    // --- DATA ---
+    const EXCLUSION_CRITERIA = [
+      { id: 'tubal', label: 'Bilateral tubal occlusion or severe tubal disease' },
+      { id: 'severe_male', label: 'Severe male factor (post-wash TMSC < 1 million)' },
+      { id: 'age_reserve', label: 'Age ≥40 with low ovarian reserve (AMH < 1.0 ng/mL or AFC < 5)' },
+      { id: 'untreated_structural', label: 'Untreated hydrosalpinx, large submucous fibroid, or severe endometriosis' },
+      { id: 'untreated_endocrine', label: 'Untreated thyroid disease, hyperprolactinaemia, or undiagnosed AUB' },
+    ];
+
+    const DIAGNOSES = [
+      { id: 'pcos', label: 'PCOS / Anovulation (WHO-II)', icon: IconActivity },
+      { id: 'unexplained', label: 'Unexplained Infertility', icon: IconCheckCircle },
+      { id: 'mild_male', label: 'Mild Male Factor (TMSC 5-10M)', icon: IconActivity },
+      { id: 'endometriosis', label: 'Mild-Moderate Endometriosis', icon: IconAlertTriangle },
+      { id: 'cervical', label: 'Cervical Factor / Ejaculatory Dys.', icon: IconCheckCircle },
+      { id: 'high_reserve', label: 'High Reserve (AMH >5) / Risk of OHSS', icon: IconAlertTriangle }
+    ];
+
+    const PROTOCOLS = {
+      pcos: {
+        firstLine: 'Letrozole 2.5 mg PO OD',
+        duration: '5 days (D2–D6 or D3–D7)',
+        escalation: 'Escalate to 5 mg, then max 7.5 mg next cycle if anovulatory/follicle <14mm by D14.',
+        secondLine: 'Clomiphene; then low-dose FSH; or ovarian drilling.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Letrozole is recommended first-line for PCOS (higher ovulation & LBR vs CC).'
+      },
+      unexplained: {
+        firstLine: 'Letrozole 2.5–5 mg OR Clomiphene 50–100 mg PO OD',
+        duration: '5 days (D2–D6)',
+        escalation: 'If poor response, escalate dose in subsequent cycles.',
+        secondLine: 'Low-dose gonadotropin (75 IU step-up) + IUI with strict cancellation criteria.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Oral agents preferred over gonadotropins to minimize multiple pregnancy risk.'
+      },
+      mild_male: {
+        firstLine: 'Letrozole or Clomiphene + IUI',
+        duration: '5 days (D2–D6)',
+        escalation: 'Escalate dose if inadequate response.',
+        secondLine: 'Low-dose gonadotropin + IUI; IVF/ICSI after 3 failed cycles.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Post-wash TMSC should be ≥ 5 million.'
+      },
+      endometriosis: {
+        firstLine: 'Letrozole + IUI (up to 3–4 cycles)',
+        duration: '5 days (D2–D6)',
+        escalation: 'Escalate letrozole dose if needed.',
+        secondLine: 'Direct IVF if age >35 or AMH low.',
+        triggerTarget: 'Lead follicle ≥18 mm AND endometrium ≥7 mm',
+        note: 'Applicable for mild-moderate post-surgical endometriosis.'
+      },
+      cervical: {
+        firstLine: 'Natural cycle IUI ± letrozole',
+        duration: '5 days (if letrozole used)',
+        escalation: 'Avoid Clomiphene due to negative effect on cervical mucus.',
+        secondLine: 'Donor IUI if applicable.',
+        triggerTarget: 'Lead follicle ≥18 mm',
+        note: 'Avoid CC due to cervical mucus effect.'
+      },
+      high_reserve: {
+        firstLine: 'Sequential Letrozole + Low-Dose Gonadotropin',
+        duration: 'Letrozole 2.5mg D2-6, then rFSH 37.5–75 IU SC from D7',
+        escalation: 'Titrate rFSH strictly based on response.',
+        secondLine: 'Strict cancellation criteria must be applied.',
+        triggerTarget: 'Lead follicle ≥17 mm with ≤3 follicles ≥14 mm',
+        note: 'Advanced protocol: Equivalent pregnancy rates with reduced gonadotropin dose and OHSS risk.'
+      }
+    };
+
+    const CANCELLATION_CRITERIA = [
+      { trigger: '≥4 follicles ≥14 mm OR ≥3 follicles ≥16 mm', action: 'CANCEL — withhold trigger; advise barrier method until next menses.', type: 'danger' },
+      { trigger: 'Estradiol >1,000 pg/mL on trigger day', action: 'CANCEL — high OHSS risk; consider conversion to IVF freeze-all.', type: 'danger' },
+      { trigger: 'No follicle ≥14 mm by D14 (oral agents)', action: 'CANCEL — poor responder. Escalate dose next cycle.', type: 'warning' },
+      { trigger: 'Endometrium <6 mm on trigger day', action: 'RELATIVE CANCEL — consider proceeding if patient counselled; switch to letrozole next cycle.', type: 'warning' },
+      { trigger: 'Premature LH surge / ovulation before trigger', action: 'Convert to natural cycle IUI within 24 h, or cancel.', type: 'info' },
+      { trigger: 'Post-wash TMSC <1 million on day of IUI', action: 'Discuss with patient: proceed with caveat OR cancel for IVF/ICSI.', type: 'info' }
+    ];
+
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      const [step, setStep] = useState(1);
+      const [exclusions, setExclusions] = useState({});
+      const [diagnosis, setDiagnosis] = useState('');
+
+      const hasExclusion = Object.values(exclusions).some(val => val === true);
+      
+      const handleExclusionToggle = (id) => {
+        setExclusions(prev => ({ ...prev, [id]: !prev[id] }));
+      };
+
+      const resetFlow = () => {
+        setStep(1);
+        setExclusions({});
+        setDiagnosis('');
+      };
+
+      const STEPS = ['Selection', 'Regimen', 'Monitoring', 'Cancellation'];
+
+      const StepIndicator = () => (
+        <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-8 px-2">
+          {STEPS.map((label, index) => {
+            const num = index + 1;
+            return (
+            <div key={num} className="flex flex-col items-center">
+              <div className="flex items-center">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-colors ${
+                  step === num ? 'bg-blue-600 text-white shadow-md' :
+                  step > num ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  {step > num ? <IconCheck size={16} /> : num}
+                </div>
+                {num < 4 && (
+                  <div className={`w-8 sm:w-12 h-1 mx-1 sm:mx-2 rounded ${step > num ? 'bg-blue-600' : 'bg-gray-100'}`} />
+                )}
+              </div>
+              <span className={`text-[10px] sm:text-xs font-medium mt-1 ${step >= num ? 'text-slate-700' : 'text-slate-400'}`}>{label}</span>
+            </div>
+          )})}
+        </div>
+      );
+
+      return (
+        <div className="min-h-screen font-sans pb-12">
+          <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <IconStethoscope className="text-white w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-slate-900 leading-tight">OI-IUI Protocol</h1>
+                  <p className="text-xs text-slate-500 font-medium">Hospital Putrajaya</p>
+                </div>
+              </div>
+              <button onClick={resetFlow} className="text-slate-400 hover:text-blue-600 flex items-center text-sm font-medium">
+                <IconRefresh size={16} className="mr-1" />
+                <span className="hidden sm:inline">New</span>
+              </button>
+            </div>
+          </header>
+
+          <main className="max-w-4xl mx-auto px-4 sm:px-6 mt-8">
+            <StepIndicator />
+
+            {/* STEP 1 */}
+            {step === 1 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Patient Selection</h2>
+                  <p className="text-sm text-slate-500 mb-6">Confirm eligibility and select primary diagnosis.</p>
+                  
+                  <div className="mb-8">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 flex items-center">
+                      <IconCheckCircle className="mr-2 text-blue-500" size={20} /> 1. Exclusions
+                    </h3>
+                    <div className="space-y-3">
+                      {EXCLUSION_CRITERIA.map(criterion => (
+                        <label key={criterion.id} className={`flex items-start p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${exclusions[criterion.id] ? 'border-red-500 bg-red-50' : 'border-slate-100 bg-white hover:border-blue-200'}`}>
+                          <div className="flex-shrink-0 mt-0.5">
+                            <input type="checkbox" className="w-5 h-5 rounded text-red-600" checked={exclusions[criterion.id] || false} onChange={() => handleExclusionToggle(criterion.id)} />
+                          </div>
+                          <span className={`ml-3 text-sm sm:text-base font-medium ${exclusions[criterion.id] ? 'text-red-900' : 'text-slate-700'}`}>{criterion.label}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {hasExclusion && (
+                      <div className="mt-4 bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl flex items-start">
+                        <IconAlertOctagon className="w-6 h-6 mr-3 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-sm sm:text-base">Not Suitable for OI-IUI</h4>
+                          <p className="text-xs sm:text-sm mt-1">Patient has exclusion criteria. Escalate to IVF/ICSI.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`transition-opacity duration-300 ${hasExclusion ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 flex items-center">
+                      <IconActivity className="mr-2 text-blue-500" size={20} /> 2. Diagnosis
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                      {DIAGNOSES.map(diag => {
+                        const Icon = diag.icon;
+                        return (
+                          <button key={diag.id} onClick={() => setDiagnosis(diag.id)} className={`text-left p-4 rounded-xl border-2 flex items-start space-x-3 ${diagnosis === diag.id ? 'border-blue-600 bg-blue-50' : 'border-slate-100 hover:border-blue-200'}`}>
+                            <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${diagnosis === diag.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                              <Icon size={18} />
+                            </div>
+                            <h3 className={`font-bold text-sm sm:text-base ${diagnosis === diag.id ? 'text-blue-900' : 'text-slate-700'}`}>{diag.label}</h3>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-slate-100">
+                    <button disabled={hasExclusion || !diagnosis} onClick={() => setStep(2)} className={`flex items-center px-6 py-3 rounded-xl font-bold ${hasExclusion || !diagnosis ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white shadow-md'}`}>
+                      Regimen <IconChevronRight className="ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2 */}
+            {step === 2 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(1)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">Recommended Regimen</h2>
+                  <p className="text-blue-600 font-semibold text-sm mb-6 flex items-center"><IconActivity size={16} className="mr-2" />{DIAGNOSES.find(d => d.id === diagnosis)?.label}</p>
+
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-2xl border border-blue-100">
+                      <h3 className="text-base font-bold text-blue-900 mb-4 flex items-center">
+                        <div className="bg-blue-600 text-white p-1.5 rounded mr-2"><IconPill size={16} /></div> First-Line Plan
+                      </h3>
+                      <div className="space-y-4">
+                        <div><p className="text-xs font-bold text-blue-500 uppercase">Medication & Dose</p><p className="text-base sm:text-lg font-bold text-slate-800">{PROTOCOLS[diagnosis].firstLine}</p></div>
+                        <div><p className="text-xs font-bold text-blue-500 uppercase">Duration</p><p className="text-sm sm:text-base text-slate-700 font-medium">{PROTOCOLS[diagnosis].duration}</p></div>
+                        <div className="bg-white/60 p-3 rounded-lg border border-blue-100/50"><p className="text-xs font-bold text-blue-500 uppercase">Escalation Rule</p><p className="text-xs sm:text-sm text-slate-700">{PROTOCOLS[diagnosis].escalation}</p></div>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-slate-50 p-5 rounded-xl border border-slate-200"><h3 className="text-xs sm:text-sm font-bold text-slate-500 uppercase flex items-center mb-2"><IconAlertTriangle size={14} className="mr-2" /> Second-Line</h3><p className="text-xs sm:text-sm text-slate-700">{PROTOCOLS[diagnosis].secondLine}</p></div>
+                      <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-100"><h3 className="text-xs sm:text-sm font-bold text-emerald-600 uppercase flex items-center mb-2"><IconInfo size={14} className="mr-2" /> Note</h3><p className="text-xs sm:text-sm text-emerald-800 font-medium">{PROTOCOLS[diagnosis].note}</p></div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 mt-6 border-t border-slate-100">
+                    <button onClick={() => setStep(3)} className="flex items-center px-6 py-3 rounded-xl font-bold bg-blue-600 text-white shadow-md">
+                      Monitoring <IconChevronRight className="ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3 */}
+            {step === 3 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(2)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 flex items-center"><IconCalendar className="mr-2 text-blue-600" size={24} /> Cycle Timeline</h2>
+
+                  <div className="relative border-l-2 border-slate-200 ml-3 space-y-8 pb-4">
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-slate-300 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-slate-800">D1 - D3: Baseline & Start</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Exclude cyst &gt;15mm or E2 &gt;50 pg/mL. Endometrium &lt;5mm. Start medication on D2 or D3.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-blue-400 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-slate-800">D8 - D10: Follicle Tracking #1</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">First TVS. Document follicles ≥10mm. Repeat every 2-3 days.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-6 h-6 bg-blue-100 border-2 border-blue-600 text-blue-600 rounded-full -left-[13px] top-0 flex items-center justify-center">
+                        <IconSyringe size={12} />
+                      </div>
+                      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4 mt-[-4px]">
+                        <h3 className="font-bold text-base sm:text-lg text-blue-900 mb-2">TRIGGER DAY</h3>
+                        <div className="text-xs sm:text-sm space-y-1">
+                          <p><strong className="text-blue-700">Target:</strong> {PROTOCOLS[diagnosis].triggerTarget}</p>
+                          <p><strong className="text-blue-700">Dose:</strong> hCG 5k–10k IU IM <span className="font-bold">OR</span> rec-hCG 250 µg SC</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-indigo-600 rounded-full border-2 border-white -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base sm:text-lg text-indigo-900">34–40h Post-Trigger: IUI</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Single IUI standard. Inseminate within 30 min of prep.</p>
+                    </div>
+                    <div className="relative pl-6">
+                      <div className="absolute w-4 h-4 bg-white border-2 border-emerald-400 rounded-full -left-[9px] top-1"></div>
+                      <h3 className="font-bold text-base text-emerald-800">Post-IUI: Luteal Support</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 mt-1">Start 1-3 days post-IUI (e.g. Vaginal Progesterone 400mg BD).</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end pt-6 mt-2 border-t border-slate-100">
+                    <button onClick={() => setStep(4)} className="flex items-center px-4 sm:px-6 py-3 rounded-xl font-bold bg-red-600 text-white shadow-md text-sm sm:text-base">
+                      Cancellation Criteria <IconChevronRight className="ml-1 sm:ml-2" size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4 */}
+            {step === 4 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6">
+                  <button onClick={() => setStep(3)} className="text-slate-400 hover:text-slate-600 mb-4 flex items-center text-sm font-medium">
+                    <IconChevronLeft size={16} className="mr-1" /> Back
+                  </button>
+                  <h2 className="text-xl sm:text-2xl font-bold text-red-700 mb-4 flex items-center"><IconAlertOctagon className="mr-2" size={24} /> Strict Cancellation</h2>
+                  
+                  <div className="space-y-3 sm:space-y-4">
+                    {CANCELLATION_CRITERIA.map((criterion, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border-l-4 ${criterion.type === 'danger' ? 'border-l-red-500 bg-red-50' : criterion.type === 'warning' ? 'border-l-amber-500 bg-amber-50' : 'border-l-blue-500 bg-blue-50'}`}>
+                        <h4 className="font-bold text-slate-800 text-sm sm:text-base mb-1">{criterion.trigger}</h4>
+                        <p className={`text-xs sm:text-sm font-medium flex items-start ${criterion.type === 'danger' ? 'text-red-900' : criterion.type === 'warning' ? 'text-amber-900' : 'text-blue-900'}`}>
+                          <IconChevronRight className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" /> <span><strong className="uppercase">Action:</strong> {criterion.action}</span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8">
+                    <button onClick={resetFlow} className="w-full bg-slate-800 text-white px-6 py-4 rounded-xl font-bold shadow text-center">
+                      Finish / Start New Patient
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
+
+```
